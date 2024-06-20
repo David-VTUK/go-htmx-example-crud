@@ -10,9 +10,7 @@
     <div id="listResult"> 
         <ul>
             {{range .}}
-            {{ block "film-list-element" .}}
-                <li>{{.Title}} ({{.Year}})</li>
-            {{end}}
+                <li>{{.Title}} ({{.Year}})</li>            
             {{end}}
         </ul>
     </div>
