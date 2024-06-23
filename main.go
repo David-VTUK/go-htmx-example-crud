@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,15 +26,15 @@ var (
 )
 
 func init() {
-	tpl = template.Must(template.ParseFiles("templates/index.html", "templates/updateForm.html"))
+	tpl = template.Must(template.ParseFiles("templates/index.html", "templates/updateForm.html", "templates/addform.html"))
 }
 
 func main() {
 	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/add/", addHandler)
+	http.HandleFunc("/add", addHandler)
 	http.HandleFunc("/delete/", deleteHandler)
-	http.HandleFunc("/get/", getHandler)
-	http.HandleFunc("/put", putHandler)
+	http.HandleFunc("/get", getHandler)
+	//http.HandleFunc("/put", putHandler)
 
 	log.Println("Server started on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -50,7 +51,6 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 		title := r.FormValue("title")
 		yearStr := r.FormValue("year")
 		year, err := strconv.Atoi(yearStr)
-
 		var newID int
 
 		if err != nil {
@@ -67,17 +67,23 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 		newMovie := movie{ID: newID, Title: title, Year: year}
 
 		movies = append(movies, newMovie)
-		tpl.ExecuteTemplate(w, "list-range", movies)
 
+		// Update the list with the new entry
+		w.Header().Set("Content-Type", "text/html")
+		err = tpl.ExecuteTemplate(w, "list-range", movies)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodDelete {
-		idStr := strings.Split(r.URL.Path, "/")
 
+		idStr := strings.Split(r.URL.Path, "/")
 		id, err := strconv.Atoi(idStr[len(idStr)-1])
+
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
 			return
@@ -97,7 +103,6 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract the ID from the URL
-
 	idStr := strings.Split(r.URL.Path, "/")
 	id, err := strconv.Atoi(idStr[len(idStr)-1])
 	if err != nil {
@@ -117,35 +122,4 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	// Render the update form with the movie details
 	w.Header().Set("Content-Type", "text/html")
 	tpl.ExecuteTemplate(w, "updateForm", selectedMovie)
-}
-
-func putHandler(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method == http.MethodPut {
-		idStr := r.FormValue("id")
-
-		id, err := strconv.Atoi(idStr)
-
-		if err != nil {
-			http.Error(w, "Invalid ID", http.StatusBadRequest)
-			return
-		}
-
-		title := r.FormValue("title")
-		yearStr := r.FormValue("year")
-		year, err := strconv.Atoi(yearStr)
-		if err != nil {
-			http.Error(w, "Invalid year", http.StatusBadRequest)
-			return
-		}
-
-		for i, m := range movies {
-			if m.ID == id {
-				movies[i] = movie{ID: id, Title: title, Year: year}
-				break
-			}
-		}
-
-		tpl.ExecuteTemplate(w, "list-range", movies)
-	}
 }

@@ -10,9 +10,8 @@
     <div id="listResult"> 
         <ul>
             {{range .}}
-                <li contenteditable="true">{{.ID}} {{.Title}} ({{.Year}}) 
+                <li contenteditable="true">{{.ID}} {{.Title}} ({{.Year}})
                     <button hx-target="#listResult" hx-delete="/delete/{{.ID}}" hx-swap="outerHTML">Delete</button>
-                    <button hx-target="#updateForm" hx-get="/get/{{.ID}}" hx-swap="outerHTML">Edit</button>
                 </li>          
             {{end}}
         </ul>
@@ -20,22 +19,20 @@
     {{end}}
        
         <h2>Add a New Movie</h2>
+        {{ block "add-form" . }}
         <div id="addForm">
-        <form hx-post="/add" hx-target="#listResult" hx-swap="innerHTML">
-            <label for="title">Title:</label>
-            <input type="text" id="title" name="title" required>
-            <br>
-            <label for="year">Year:</label>
-            <input type="number" id="year" name="year" required>
-            <br>
-            <button type="submit">Add Film</button>
-        </form>
-    </div>
-
-    <h2>Update an Existing Movie</h2>
-    <div id="updateForm">
-        <!-- The update form will be dynamically loaded here -->
-    </div>
+            <form id="addMovieForm" hx-post="/add" hx-target="#listResult" hx-swap="outerHTML">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required>
+                <br>
+                <label for="year">Year:</label>
+                <input type="number" id="year" name="year" required>
+                <br>
+                <button type="submit">Add Film</button>
+            </form>
+        </div>
+        {{end}}
 
 </body>
 </html>
+
