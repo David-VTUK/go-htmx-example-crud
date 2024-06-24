@@ -12,7 +12,7 @@
 				"golang.Go",
                 "ecmel.vscode-html-css",
                 "sidthesloth.html5-boilerplate",
-				"GitHub.copilot",
+				"gitHub.copilot",
 				"bradlc.vscode-tailwindcss"
 
 			]
